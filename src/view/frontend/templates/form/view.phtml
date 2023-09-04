@@ -1,0 +1,154 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+// $formId = $block->getData('form_id');
+$formId = '1';
+
+/* @var \Magmodules\Shopreview\ViewModel\Form\View $viewModel */
+$viewModel = $block->getViewModel();
+
+if ($formId) {
+    $viewModel->setFormId($formId);
+}
+
+/* @var \Magmodules\Shopreview\Api\Form\DataInterface $form */
+$form = $viewModel->getForm();
+$description = $viewModel->getFormOption($form, 'description');
+?>
+
+
+<?= /* @noEscape */ $viewModel->renderDescription($description); ?>
+
+<?php if (!$formId): ?>
+<form class="review-form"
+    name='review[<?= $block->escapeHtml($form->getId()) ?>]'
+    id="review-form"
+    action="<?= $block->escapeUrl($block->getUrl('shopreview/form/save')) ?>">
+<?php endif ?>
+
+    <input name='form_id' value="<?= $block->escapeHtml($form->getId()) ?>" type="hidden"/>
+    <input name='store_id' value="<?= $block->escapeHtml($viewModel->getStoreId()) ?>" type="hidden"/>
+
+    <div class="fieldset review-fieldset grid gap-2">
+        <?php foreach ($form->getFields((int)$viewModel->getStoreId()) as $field): ?>
+            <?php if (!$viewModel->getFieldOption($field, 'enabled')) { 
+                continue; 
+            } ?>
+
+            <?php
+                $is_required = $viewModel->getFieldOption($field, 'required');
+                $field_id = $field->getId();
+                $field_title = $viewModel->getFieldOption($field, 'title');
+                $field_validation_msg = $viewModel->getFieldOption($field, 'validation');
+                $field_placeholder = $viewModel->getFieldOption($field, 'placeholder');
+                $fieldOptions = $viewModel->getFieldOption($field, 'options');
+            ?>
+
+            <?php switch ($field->getType()):
+                  case 'text': ?>
+
+                <div class="review-field-<?= $block->escapeHtml($field_id); ?>">
+                    <label class="sr-only label" for="field_<?= $block->escapeHtml($field_id); ?>">
+                        <?= $block->escapeHtml($field_title) ?>
+                    </label>
+                    <div class="control">
+                        <input
+                            id="field_<?= $block->escapeHtml($field_id); ?>"
+                            class="form-input text-sm w-full max-w-md"
+                            name="field[<?= $block->escapeHtml($field_id); ?>]"
+                            type="text"
+                            placeholder="<?= $field_placeholder 
+                                                ? $block->escapeHtml($field_placeholder) 
+                                                : $block->escapeHtml($field_title); ?> <?= $is_required ? '*' : '' ?>"
+                            <?= $is_required ? 'required' : '' ?>
+                            data-msg-required="<?= $block->escapeHtml($field_validation_msg); ?>"
+                        />
+                    </div>
+                </div>
+                    
+            <?php break;
+                  case 'select': ?>
+                <!-- There is no such type, but it was described in the module -->
+            <?php break;
+                  case 'textarea': ?>
+
+                <div class="review-field-<?= $block->escapeHtml($field_id) ?>">
+                    <label class="sr-only label" for="field_<?= $block->escapeHtml($field_id); ?>">
+                        <?= $block->escapeHtml($field_title) ?>
+                    </label>
+                    <div class="control">
+                        <textarea
+                            rows="5"
+                            id="field_<?= $block->escapeHtml($field_id); ?>"
+                            class="form-input text-sm w-full max-w-md"
+                            name="field[<?= $block->escapeHtml($field_id) ?>]"
+                            placeholder="<?= $field_placeholder 
+                                            ? $block->escapeHtml($field_placeholder) 
+                                            : $block->escapeHtml($field_title); ?> <?= $is_required ? '*' : '' ?>"
+                            <?= $is_required ? 'required' : '' ?>
+                            data-msg-required="<?= $block->escapeHtml($field_validation_msg); ?>"></textarea>
+                    </div>
+                </div>
+            <?php break;
+                  case 'rating': ?>
+
+                <div class="review-field-<?= $block->escapeHtml($field_id); ?> sm:flex sm:items-center">
+                    <label class="pr-5 text-sm !mb-0" 
+                           id="review-field-rating-<?= $block->escapeHtml($field_id) ?>">
+                        <?= $block->escapeHtml($field_title) . ':'; ?>
+                    </label>
+
+                    <div class="flex flex-row grow-0 -ml-1" x-data="{ clickedRatingId: 0, focusId: 0 }">
+                        <?php $start = $viewModel->getFieldOption($field, 'stars'); ?>
+                        <?php for ($i = 1; $i <= $start; $i++): ?>
+                            <?php
+                                $fieldId = sprintf('field_%s_%s', $field_id, $i);
+                                $for = sprintf('field_%s_%s', $field_id, $i);
+                            ?>
+
+                            <div class="relative"
+                                @click="clickedRatingId = <?= $i ?> || 0"
+                                @mouseover="focusId = <?= $i ?> || 0"
+                                @mouseleave="focusId = 0">
+                                
+                                <input type="radio" 
+                                    class="absolute opacity-0 bottom-0 left-0 cursor-pointer"
+                                    name="field[<?= $block->escapeHtml($field_id); ?>]"
+                                    id="<?= $block->escapeHtml($fieldId) ?>"
+                                    value="<?= $block->escapeHtml($i); ?>"
+                                    <?= $is_required ? 'required' : '' ?>>
+
+                                <label
+                                    class="rating-<?= $block->escapeHtml($i) ?> m-0 cursor-pointer text-gray-400"
+                                    for="<?= $block->escapeHtml($for) ?>"
+                                    title="<?= $block->escapeHtml($i) ?> star">
+
+                                    <span class="text-stone-200" 
+                                        :class="<?= $i ?> <= focusId ? '!text-yellow-400' : '' ">
+                                        <span class="transition-colors duration-300"
+                                            :class="<?= $i ?> <= clickedRatingId ? 'text-yellow-400' : '' ">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-8 h-8">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                            </svg>
+                                        </span>
+                                    </sapn>
+                                </label>
+                            </div>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+            <?php endswitch; ?>
+
+        <?php endforeach; ?>
+    </div>
+
+<?php if (!$formId): ?>
+    <button type="submit" name="submit" class="btn btn-primary mt-3">
+        <?= $block->escapeHtml(__('Save review')) ?>
+    </button>
+</form>
+<?php endif ?>
