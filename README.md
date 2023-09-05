@@ -1,5 +1,4 @@
-
-![265448554-25bf88eb-c629-46e6-bcf3-3053bc6dbbca](https://github.com/magmodules/magento2-shopreview-hyva/assets/24823946/120a0c44-0d61-4110-88db-7fee011968fd)
+![265448554-25bf88eb-c629-46e6-bcf3-3053bc6dbbca](https://github.com/magmodules/magento2-shopreview-hyva/assets/24823946/5473ab70-4f57-4ad3-be96-df9b4f03409c)
 
 
 # Shopreviews Hyvä Compatibility plugin
