@@ -23,7 +23,7 @@ Shopreview for Magento empowers you to customize review forms to your liking. As
 1. Install the module using composer: 
 
 ```bash
-composer require magmodules/magento2-shopreview-hyva
+composer require magmodules/magento2-hyva-shopreview
 ```
 
 2. Enable the module:
