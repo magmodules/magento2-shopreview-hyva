@@ -5,8 +5,7 @@
  */
 ?>
 <?php
-// $formId = $block->getData('form_id');
-$formId = '1';
+$formId = $block->getData('form_id');
 
 /* @var \Magmodules\Shopreview\ViewModel\Form\View $viewModel */
 $viewModel = $block->getViewModel();
@@ -20,7 +19,6 @@ $form = $viewModel->getForm();
 $description = $viewModel->getFormOption($form, 'description');
 ?>
 
-
 <?= /* @noEscape */ $viewModel->renderDescription($description); ?>
 
 <?php if (!$formId): ?>
@@ -30,6 +28,7 @@ $description = $viewModel->getFormOption($form, 'description');
     action="<?= $block->escapeUrl($block->getUrl('shopreview/form/save')) ?>">
 <?php endif ?>
 
+    <?= $block->getBlockHtml('formkey') ?>
     <input name='form_id' value="<?= $block->escapeHtml($form->getId()) ?>" type="hidden"/>
     <input name='store_id' value="<?= $block->escapeHtml($viewModel->getStoreId()) ?>" type="hidden"/>
 
